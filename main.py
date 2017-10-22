@@ -27,6 +27,7 @@ async def on_ready():
 @client.event
 async def on_message_delete(msg):
     """Logs removed messages."""
+
     embed_message = discord.Embed(title="A message was deleted!", \
             description="**Timestamp:** {time}\n**User:** {user}\n**Channel:** {channel}".format(\
             time=time.strftime('%l:%M%p %Z on %b %d, %Y'), user=msg.author, channel=msg.channel.name), color=0xff0000)
@@ -36,6 +37,7 @@ async def on_message_delete(msg):
 
 @client.event
 async def on_message_edit(msg_old, msg_new):
+
     """Logs edited messages."""
     embed_message = discord.Embed(title="A message was edited!", \
         description="**Timestamp:** {time}\n**User:** {user}\n**Channel:** {channel}".format(\
@@ -45,5 +47,18 @@ async def on_message_edit(msg_old, msg_new):
     await client.send_message(discord.Object(id=LOG_CHANNEL_ID), embed=embed_message)
 
 
+@client.event
+async def on_message(msg):
+    """Logs all messages locally."""
+
+    while True:
+        try:
+            with open(os.path.dirname(os.path.realpath(__file__)) + "/logs/" + time.strftime("%Y-%m-%d", time.localtime(time.time())), "a") as log: # Open log file at /logs
+                timenow = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time())) #Ex: 1990-04-14 15:23:52
+                log.write("%s %s [%s -> %s]: %s\n" % (timenow, msg.author, msg.server, msg.channel, msg.content))
+                break 
+        except FileNotFoundError: # If there's no /logs folder
+            os.mkdir(os.path.dirname(os.path.realpath(__file__)) + "/logs") # Create it and try again
+            
 # Start Bot
 client.run(auth.bot_token)

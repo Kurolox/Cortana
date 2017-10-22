@@ -37,14 +37,14 @@ async def on_message_delete(msg):
 
 @client.event
 async def on_message_edit(msg_old, msg_new):
-
     """Logs edited messages."""
-    embed_message = discord.Embed(title="A message was edited!", \
-        description="**Timestamp:** {time}\n**User:** {user}\n**Channel:** {channel}".format(\
-        time=time.strftime('%l:%M%p %Z on %b %d, %Y'), user=msg_old.author, channel=msg_old.channel.name), color=0xffbf00)
-    embed_message.add_field(name="Before:", value=msg_old.content, inline=False)
-    embed_message.add_field(name="After:", value=underliner(msg_old.content, msg_new.content), inline=False)
-    await client.send_message(discord.Object(id=LOG_CHANNEL_ID), embed=embed_message)
+    if msg_old.content != msg_new.content: # Otherwise it will trigger with embeds (like links)
+        embed_message = discord.Embed(title="A message was edited!", \
+            description="**Timestamp:** {time}\n**User:** {user}\n**Channel:** {channel}".format(\
+            time=time.strftime('%l:%M%p %Z on %b %d, %Y'), user=msg_old.author, channel=msg_old.channel.name), color=0xffbf00)
+        embed_message.add_field(name="Before:", value=msg_old.content, inline=False)
+        embed_message.add_field(name="After:", value=underliner(msg_old.content, msg_new.content), inline=False)
+        await client.send_message(discord.Object(id=LOG_CHANNEL_ID), embed=embed_message)
 
 
 @client.event

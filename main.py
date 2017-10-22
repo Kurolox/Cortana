@@ -43,7 +43,7 @@ async def on_message_edit(msg_old, msg_new):
         description="**Timestamp:** {time}\n**User:** {user}\n**Channel:** {channel}".format(\
         time=time.strftime('%l:%M%p %Z on %b %d, %Y'), user=msg_old.author, channel=msg_old.channel.name), color=0xffbf00)
     embed_message.add_field(name="Before:", value=msg_old.content, inline=False)
-    embed_message.add_field(name="After:", value=msg_new.content, inline=False)
+    embed_message.add_field(name="After:", value=underliner(msg_old.content, msg_new.content), inline=False)
     await client.send_message(discord.Object(id=LOG_CHANNEL_ID), embed=embed_message)
 
 
@@ -60,5 +60,23 @@ async def on_message(msg):
         except FileNotFoundError: # If there's no /logs folder
             os.mkdir(os.path.dirname(os.path.realpath(__file__)) + "/logs") # Create it and try again
             
+
+def underliner(old_content, new_content):
+    """Underlines all the changes in the new message for easy change recognition."""
+    old_list = old_content.split(" ")
+    new_list = new_content.split(" ")
+    if len(old_list) >= len(new_list):
+        for word in range(len(new_list)):
+            if old_list[word] != new_list[word]:
+                new_list[word] = "__" + new_list[word] + "__"
+    else:
+        for word in range(len(old_list)):
+            if old_list[word] != new_list[word]:
+                new_list[word] = "__" + new_list[word] + "__"
+
+    underlined_content = " ".join(new_list)
+    return underlined_content
+
+
 # Start Bot
 client.run(auth.bot_token)
